@@ -1,36 +1,63 @@
 name: DevSecOps CI/CD Pipeline
 
-# Trigger: runs on every push to main branch
 on:
   push:
     branches: [ main ]
 
 jobs:
-  build-and-deploy:
+  build-scan-deploy:
     runs-on: ubuntu-latest
 
     steps:
 
-      # Step 1: Pull your code into the GitHub Actions runner
+      # ─── STAGE 1: GET CODE ───────────────────────────────────────
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # Step 2: Login to Docker Hub
+      # ─── STAGE 2: DEPENDENCY SCAN ────────────────────────────────
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install Safety Scanner
+        run: pip install safety
+
+      - name: OWASP Safety - Scan Python Dependencies
+        run: |
+          echo "Scanning requirements.txt for known vulnerabilities..."
+          safety check -r requirements.txt --output text || true
+
+      # ─── STAGE 3: BUILD ──────────────────────────────────────────
+      - name: Build Docker Image
+        run: |
+          echo "Building Docker image..."
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/devsecops-app:latest .
+          echo "Docker image built successfully"
+
+      # ─── STAGE 4: TRIVY IMAGE SCAN ───────────────────────────────
+      - name: Run Trivy Vulnerability Scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ secrets.DOCKER_USERNAME }}/devsecops-app:latest
+          format: table
+          exit-code: '1'
+          severity: CRITICAL
+          vuln-type: os,library
+
+      # ─── STAGE 5: PUSH (only if scan passed) ─────────────────────
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # Step 3: Build Docker image and push to Docker Hub
-      - name: Build and Push Docker Image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/devsecops-app:latest
+      - name: Push Verified Image to Docker Hub
+        run: |
+          echo "Security scan passed. Pushing image..."
+          docker push ${{ secrets.DOCKER_USERNAME }}/devsecops-app:latest
 
-      # Step 4: SSH into EC2 and deploy new container
+      # ─── STAGE 6: DEPLOY (only if scan passed) ───────────────────
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.0.0
         with:
@@ -38,15 +65,11 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            # Pull latest image from Docker Hub
+            echo "Deploying verified image to EC2..."
             docker pull ${{ secrets.DOCKER_USERNAME }}/devsecops-app:latest
-
-            # Stop and remove old container if running
             docker stop myapp || true
             docker rm myapp || true
-
-            # Run new container
-            docker run -d -p 8080:8080 --name myapp ${{ secrets.DOCKER_USERNAME }}/devsecops-app:latest
-
-            # Show running containers
+            docker run -d -p 8080:8080 --name myapp \
+              ${{ secrets.DOCKER_USERNAME }}/devsecops-app:latest
+            echo "Deployment complete"
             docker ps
