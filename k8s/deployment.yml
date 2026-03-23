@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: devsecops-app
+  labels:
+    app: devsecops-app
+spec:
+  # Run 2 copies of your app for high availability
+  replicas: 2
+  selector:
+    matchLabels:
+      app: devsecops-app
+  template:
+    metadata:
+      labels:
+        app: devsecops-app
+    spec:
+      containers:
+        - name: devsecops-app
+          # Pull image from Docker Hub
+          image: raghav7704/devsecops-app:latest
+          ports:
+            - containerPort: 8080
+          # Health check — Kubernetes restarts container if this fails
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          # Resource limits — prevents one container eating all memory
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "100m"
+            limits:
+              memory: "128Mi"
+              cpu: "200m"
