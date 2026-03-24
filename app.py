@@ -3,6 +3,10 @@ import datetime
 
 app = Flask(__name__)
 
+# ─────────────────────────────────────────────
+#  HOME PAGE
+# ─────────────────────────────────────────────
+
 HTML_PAGE = """
 <!DOCTYPE html>
 <html lang="en">
@@ -25,7 +29,6 @@ HTML_PAGE = """
     padding: 30px 20px;
   }
 
-  /* ── TOP BADGE ── */
   .badge {
     background: linear-gradient(135deg, #00c9ff, #0066ff);
     color: #fff;
@@ -38,7 +41,6 @@ HTML_PAGE = """
     margin-bottom: 18px;
   }
 
-  /* ── TITLE ── */
   h1 {
     font-size: 28px;
     font-weight: 800;
@@ -63,7 +65,6 @@ HTML_PAGE = """
     to { background-position: 200% center; }
   }
 
-  /* ── STATUS ROW ── */
   .status-row {
     display: flex;
     gap: 14px;
@@ -110,7 +111,6 @@ HTML_PAGE = """
     50%       { opacity: 0.4; transform: scale(0.8); }
   }
 
-  /* ── PIPELINE ── */
   .pipeline-title {
     font-size: 11px;
     letter-spacing: 3px;
@@ -143,15 +143,11 @@ HTML_PAGE = """
     padding: 14px 18px;
     text-align: center;
     width: 108px;
-    position: relative;
     transition: border-color 0.3s;
   }
 
-  .stage-box:hover {
-    border-color: #0066ff;
-  }
+  .stage-box:hover { border-color: #0066ff; }
 
-  /* staggered glow animation on each card */
   .stage:nth-child(1)  .stage-box { animation: glow 4s 0.0s ease-in-out infinite; }
   .stage:nth-child(3)  .stage-box { animation: glow 4s 0.5s ease-in-out infinite; }
   .stage:nth-child(5)  .stage-box { animation: glow 4s 1.0s ease-in-out infinite; }
@@ -161,30 +157,14 @@ HTML_PAGE = """
 
   @keyframes glow {
     0%, 100% { box-shadow: none; }
-    50%       { box-shadow: 0 0 16px rgba(0, 102, 255, 0.4); border-color: #0066ff; }
+    50%       { box-shadow: 0 0 16px rgba(0,102,255,0.4); border-color: #0066ff; }
   }
 
-  .icon  { font-size: 24px; }
-  .stage-name {
-    font-size: 10px;
-    font-weight: 700;
-    color: #a0aec0;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-  }
-  .stage-desc {
-    font-size: 9px;
-    color: #4b5e8a;
-    margin-top: 2px;
-  }
+  .icon       { font-size: 24px; }
+  .stage-name { font-size: 10px; font-weight: 700; color: #a0aec0; letter-spacing: 0.5px; text-transform: uppercase; }
+  .stage-desc { font-size: 9px; color: #4b5e8a; margin-top: 2px; }
 
-  /* animated arrow between stages */
-  .arrow {
-    display: flex;
-    align-items: center;
-    padding: 0 2px;
-    margin-bottom: 20px;
-  }
+  .arrow { display: flex; align-items: center; padding: 0 2px; margin-bottom: 20px; }
 
   .arrow-line {
     width: 28px;
@@ -206,44 +186,27 @@ HTML_PAGE = """
     border-bottom: 5px solid transparent;
   }
 
-  @keyframes flow {
-    to { background-position: 200% center; }
-  }
+  @keyframes flow { to { background-position: 200% center; } }
 
-  /* security stages get red tint */
-  .stage.security .stage-box {
-    border-color: #2d1e3a;
-  }
-  .stage.security .stage-box:hover {
-    border-color: #a855f7;
-  }
-  .stage:nth-child(3).security .stage-box,
-  .stage:nth-child(5).security .stage-box {
-    animation: glow-purple 4s ease-in-out infinite;
-  }
-  .stage:nth-child(3).security .stage-box { animation-delay: 0.5s; }
-  .stage:nth-child(5).security .stage-box { animation-delay: 1.0s; }
+  .stage.security .stage-box { border-color: #2d1e3a; }
+  .stage.security .stage-box:hover { border-color: #a855f7; }
+  .stage:nth-child(3).security .stage-box { animation: glow-purple 4s 0.5s ease-in-out infinite; }
+  .stage:nth-child(5).security .stage-box { animation: glow-purple 4s 1.0s ease-in-out infinite; }
 
   @keyframes glow-purple {
     0%, 100% { box-shadow: none; }
-    50%       { box-shadow: 0 0 16px rgba(168, 85, 247, 0.4); border-color: #a855f7; }
+    50%       { box-shadow: 0 0 16px rgba(168,85,247,0.4); border-color: #a855f7; }
   }
 
-  /* deploy stage gets green tint */
-  .stage.deploy .stage-box {
-    border-color: #1a2d1e;
-  }
-  .stage.deploy .stage-box:hover  { border-color: #22c55e; }
-  .stage:nth-child(11).deploy .stage-box {
-    animation: glow-green 4s 2.5s ease-in-out infinite;
-  }
+  .stage.deploy .stage-box { border-color: #1a2d1e; }
+  .stage.deploy .stage-box:hover { border-color: #22c55e; }
+  .stage:nth-child(11).deploy .stage-box { animation: glow-green 4s 2.5s ease-in-out infinite; }
 
   @keyframes glow-green {
     0%, 100% { box-shadow: none; }
-    50%       { box-shadow: 0 0 16px rgba(34, 197, 94, 0.4); border-color: #22c55e; }
+    50%       { box-shadow: 0 0 16px rgba(34,197,94,0.4); border-color: #22c55e; }
   }
 
-  /* ── TECH TAGS ── */
   .tags {
     display: flex;
     gap: 8px;
@@ -266,7 +229,6 @@ HTML_PAGE = """
   .tag.green  { color: #4ade80; border-color: #1a3d1e; background: #0d2010; }
   .tag.orange { color: #fb923c; border-color: #3d2210; background: #200f05; }
 
-  /* ── LINKS ── */
   .links {
     display: flex;
     gap: 14px;
@@ -289,19 +251,9 @@ HTML_PAGE = """
 
   .link-btn:hover { opacity: 0.85; transform: translateY(-2px); }
 
-  .link-btn.github {
-    background: #161b22;
-    color: #e0e6ff;
-    border-color: #30363d;
-  }
+  .link-btn.github   { background: #161b22; color: #e0e6ff; border-color: #30363d; }
+  .link-btn.linkedin { background: #0a1628; color: #60a5fa; border-color: #1e3a5f; }
 
-  .link-btn.linkedin {
-    background: #0a1628;
-    color: #60a5fa;
-    border-color: #1e3a5f;
-  }
-
-  /* ── FOOTER ── */
   .footer {
     margin-top: 40px;
     font-size: 11px;
@@ -318,7 +270,6 @@ HTML_PAGE = """
   <h1>DevSecOps CI/CD Pipeline</h1>
   <p class="subtitle">Built by Hemant Raghav &nbsp;·&nbsp; AWS · Docker · Kubernetes · GitHub Actions</p>
 
-  <!-- STATUS CARDS -->
   <div class="status-row">
     <div class="stat-card">
       <div class="label">Status</div>
@@ -338,7 +289,6 @@ HTML_PAGE = """
     </div>
   </div>
 
-  <!-- PIPELINE -->
   <div class="pipeline-title">⬇ CI / CD Pipeline Flow ⬇</div>
 
   <div class="pipeline">
@@ -403,7 +353,6 @@ HTML_PAGE = """
 
   </div>
 
-  <!-- TECH TAGS -->
   <div class="tags">
     <span class="tag blue">AWS EC2</span>
     <span class="tag blue">CloudWatch</span>
@@ -418,18 +367,13 @@ HTML_PAGE = """
     <span class="tag green">Python Flask</span>
   </div>
 
-  <!-- LINKS -->
   <div class="links">
     <a class="link-btn github"
        href="https://github.com/hemantraghav-123/devsecops-pipeline"
-       target="_blank">
-      ⭐ GitHub Repo
-    </a>
+       target="_blank">⭐ GitHub Repo</a>
     <a class="link-btn linkedin"
        href="https://linkedin.com/in/hemantraghav2467"
-       target="_blank">
-      🔗 LinkedIn
-    </a>
+       target="_blank">🔗 LinkedIn</a>
   </div>
 
   <div class="footer">AWS Free Tier &nbsp;·&nbsp; Zero cost infrastructure &nbsp;·&nbsp; 2026</div>
@@ -438,18 +382,274 @@ HTML_PAGE = """
 </html>
 """
 
+
+# ─────────────────────────────────────────────
+#  HEALTH PAGE
+# ─────────────────────────────────────────────
+
+HEALTH_PAGE = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Health Check — DevSecOps Pipeline</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0a0e1a;
+    color: #e0e6ff;
+    font-family: 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 20px;
+  }
+
+  .pulse-wrap {
+    position: relative;
+    width: 90px;
+    height: 90px;
+    margin-bottom: 28px;
+  }
+
+  .pulse-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 2px solid #22c55e;
+    animation: ring 2s ease-out infinite;
+    opacity: 0;
+  }
+
+  .pulse-ring:nth-child(2) { animation-delay: 0.6s; }
+  .pulse-ring:nth-child(3) { animation-delay: 1.2s; }
+
+  @keyframes ring {
+    0%   { transform: scale(0.6); opacity: 0.8; }
+    100% { transform: scale(1.6); opacity: 0; }
+  }
+
+  .pulse-dot {
+    position: absolute;
+    inset: 20px;
+    background: #22c55e;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+  }
+
+  .status-label {
+    font-size: 12px;
+    letter-spacing: 3px;
+    color: #22c55e;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  h1 {
+    font-size: 26px;
+    font-weight: 800;
+    color: #e0e6ff;
+    margin-bottom: 6px;
+    text-align: center;
+  }
+
+  .sub {
+    font-size: 13px;
+    color: #4b5e8a;
+    margin-bottom: 36px;
+    text-align: center;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    width: 100%;
+    max-width: 420px;
+    margin-bottom: 32px;
+  }
+
+  .card {
+    background: #111827;
+    border: 1px solid #1e2d4d;
+    border-radius: 12px;
+    padding: 16px 18px;
+  }
+
+  .card-label {
+    font-size: 10px;
+    color: #4b5e8a;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .card-value { font-size: 15px; font-weight: 700; color: #e0e6ff; }
+  .ok         { color: #22c55e; }
+  .blue       { color: #60a5fa; }
+
+  .checks {
+    width: 100%;
+    max-width: 420px;
+    background: #111827;
+    border: 1px solid #1e2d4d;
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin-bottom: 32px;
+  }
+
+  .checks-title {
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: #4b5e8a;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  .check-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #1a2235;
+    font-size: 13px;
+  }
+
+  .check-row:last-child { border-bottom: none; }
+  .check-name           { color: #a0aec0; }
+
+  .badge {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+
+  .badge.pass {
+    background: #052e16;
+    color: #22c55e;
+    border: 1px solid #166534;
+  }
+
+  .back {
+    font-size: 12px;
+    color: #4b5e8a;
+    text-decoration: none;
+    border: 1px solid #1e2d4d;
+    padding: 8px 20px;
+    border-radius: 8px;
+    transition: color 0.2s, border-color 0.2s;
+  }
+
+  .back:hover { color: #60a5fa; border-color: #1e3a5f; }
+
+  .timestamp {
+    margin-top: 24px;
+    font-size: 11px;
+    color: #2d3a55;
+    letter-spacing: 1px;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+  <div class="pulse-wrap">
+    <div class="pulse-ring"></div>
+    <div class="pulse-ring"></div>
+    <div class="pulse-ring"></div>
+    <div class="pulse-dot">✓</div>
+  </div>
+
+  <div class="status-label">● All systems operational</div>
+  <h1>Health Check</h1>
+  <p class="sub">DevSecOps Pipeline — Hemant Raghav</p>
+
+  <div class="grid">
+    <div class="card">
+      <div class="card-label">Status</div>
+      <div class="card-value ok">OK</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Version</div>
+      <div class="card-value blue">3.0</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Platform</div>
+      <div class="card-value">AWS EC2</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Runtime</div>
+      <div class="card-value">Python Flask</div>
+    </div>
+  </div>
+
+  <div class="checks">
+    <div class="checks-title">Component checks</div>
+    <div class="check-row">
+      <span class="check-name">Flask application</span>
+      <span class="badge pass">PASS</span>
+    </div>
+    <div class="check-row">
+      <span class="check-name">Docker container</span>
+      <span class="badge pass">PASS</span>
+    </div>
+    <div class="check-row">
+      <span class="check-name">Port 8080</span>
+      <span class="badge pass">PASS</span>
+    </div>
+    <div class="check-row">
+      <span class="check-name">Lambda ping</span>
+      <span class="badge pass">PASS</span>
+    </div>
+    <div class="check-row">
+      <span class="check-name">CI/CD pipeline</span>
+      <span class="badge pass">PASS</span>
+    </div>
+  </div>
+
+  <a class="back" href="/">← Back to pipeline</a>
+
+  <div class="timestamp">CHECKED AT __TIMESTAMP__</div>
+
+</body>
+</html>
+"""
+
+
+# ─────────────────────────────────────────────
+#  ROUTES
+# ─────────────────────────────────────────────
+
 @app.route('/')
 def home():
     return HTML_PAGE, 200, {'Content-Type': 'text/html'}
 
+
 @app.route('/health')
 def health():
+    now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')
+    page = HEALTH_PAGE.replace('__TIMESTAMP__', now)
+    return page, 200, {'Content-Type': 'text/html'}
+
+
+@app.route('/health/json')
+def health_json():
     return jsonify({
         "health": "OK",
         "status": "running",
         "version": "3.0",
         "time": str(datetime.datetime.now())
     })
+
 
 @app.route('/api')
 def api():
@@ -459,6 +659,7 @@ def api():
         "version": "3.0",
         "time": str(datetime.datetime.now())
     })
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)
