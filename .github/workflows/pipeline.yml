@@ -64,13 +64,12 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          command_timeout: 30m
+          command_timeout: 30
           script: |
-            echo "Deploying verified image to EC2..."
+            docker image prune -a -f
             docker pull ${{ secrets.DOCKER_USERNAME }}/devsecops-app:latest
             docker stop myapp || true
             docker rm myapp || true
             docker run -d -p 8080:8080 --name myapp \
               ${{ secrets.DOCKER_USERNAME }}/devsecops-app:latest
-            echo "Deployment complete"
             docker ps
