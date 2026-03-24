@@ -64,6 +64,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
+          command_timeout: 30m
           script: |
             echo "Deploying verified image to EC2..."
             docker pull ${{ secrets.DOCKER_USERNAME }}/devsecops-app:latest
