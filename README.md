@@ -4,8 +4,8 @@ A production-grade DevSecOps pipeline with automated security scanning,
 Kubernetes orchestration, and full AWS observability stack.
 
 ## 🔗 Live Demo
-- Docker deployment: http://98.88.1.75:8080
-- Kubernetes deployment: http://98.88.1.75:30080
+- Docker deployment: http://hemant-dev.duckdns.org:8080
+- Kubernetes deployment: http://hemant-dev.duckdns.org:30080
 
 ## 🏗️ Architecture
 ```
