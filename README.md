@@ -5,7 +5,7 @@ Kubernetes orchestration, and full AWS observability stack.
 
 ## 🔗 Live Demo
 - Docker deployment: http://hemant-dev.duckdns.org:8080
-- Kubernetes deployment: http://hemant-dev.duckdns.org:30080
+- Kubernetes deployment: http://hemant-dev.duckdns.org:31080
 
 ## 🏗️ Architecture
 ```

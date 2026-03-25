@@ -12,6 +12,6 @@ spec:
       port: 8080
       targetPort: 8080
       # NodePort range is 30000-32767
-      # We pick 30080 — accessible at EC2_IP:30080
-      nodePort: 30080
+      # We pick 31080 — accessible at EC2_IP:31080
+      nodePort: 31080
 
