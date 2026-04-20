@@ -57,7 +57,7 @@ jobs:
           echo "Security scan passed. Pushing image..."
           docker push ${{ secrets.DOCKER_USERNAME }}/devsecops-app:latest
 
-      # ─── STAGE 6: DEPLOY (only if scan passed) ───────────────────
+      # ─── STAGE 6: DEPLOY ─────────────────────────────────────────
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.0.0
         with:
@@ -65,10 +65,13 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            docker image prune -a -f
+            cd ~/devsecops-app
+
+            # Pull latest Flask image
             docker pull ${{ secrets.DOCKER_USERNAME }}/devsecops-app:latest
-            docker stop myapp || true
-            docker rm myapp || true
-            docker run -d -p 8080:8080 --name myapp \
-              ${{ secrets.DOCKER_USERNAME }}/devsecops-app:latest
-            docker ps
+
+            # Restart only the flask app container, keep Prometheus+Grafana running
+            docker compose up -d --no-deps flask-app
+
+            echo "Deployment complete"
+            docker compose ps
