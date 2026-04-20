@@ -1,7 +1,41 @@
 from flask import Flask, jsonify
 import datetime
+from prometheus_flask_exporter import PrometheusMetrics
+from prometheus_client import Counter, Histogram, Gauge
+import time
 
 app = Flask(__name__)
+
+# ─────────────────────────────────────────────
+#  PROMETHEUS METRICS SETUP
+#  Adds /metrics endpoint automatically
+#  Auto-tracks every route: count, latency, status codes
+# ─────────────────────────────────────────────
+
+metrics = PrometheusMetrics(app)
+
+# Custom business metrics
+REQUEST_COUNT = Counter(
+    'devsecops_requests_total',
+    'Total number of requests received',
+    ['endpoint', 'method']
+)
+
+RESPONSE_TIME = Histogram(
+    'devsecops_response_seconds',
+    'Response time in seconds',
+    ['endpoint']
+)
+
+APP_INFO = Gauge(
+    'devsecops_app_info',
+    'App version information',
+    ['version']
+)
+
+# Set app info metric once at startup
+APP_INFO.labels(version='3.0').set(1)
+
 
 # ─────────────────────────────────────────────
 #  HOME PAGE
@@ -365,6 +399,8 @@ HTML_PAGE = """
     <span class="tag purple">Trivy</span>
     <span class="tag purple">OWASP Safety</span>
     <span class="tag green">Python Flask</span>
+    <span class="tag green">Prometheus</span>
+    <span class="tag orange">Grafana</span>
   </div>
 
   <div class="links">
@@ -614,6 +650,10 @@ HEALTH_PAGE = """
       <span class="check-name">CI/CD pipeline</span>
       <span class="badge pass">PASS</span>
     </div>
+    <div class="check-row">
+      <span class="check-name">Prometheus metrics</span>
+      <span class="badge pass">PASS</span>
+    </div>
   </div>
 
   <a class="back" href="/">← Back to pipeline</a>
@@ -631,11 +671,13 @@ HEALTH_PAGE = """
 
 @app.route('/')
 def home():
+    REQUEST_COUNT.labels(endpoint='home', method='GET').inc()
     return HTML_PAGE, 200, {'Content-Type': 'text/html'}
 
 
 @app.route('/health')
 def health():
+    REQUEST_COUNT.labels(endpoint='health', method='GET').inc()
     now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')
     page = HEALTH_PAGE.replace('__TIMESTAMP__', now)
     return page, 200, {'Content-Type': 'text/html'}
@@ -643,6 +685,7 @@ def health():
 
 @app.route('/health/json')
 def health_json():
+    REQUEST_COUNT.labels(endpoint='health_json', method='GET').inc()
     return jsonify({
         "health": "OK",
         "status": "running",
@@ -653,12 +696,21 @@ def health_json():
 
 @app.route('/api')
 def api():
+    REQUEST_COUNT.labels(endpoint='api', method='GET').inc()
     return jsonify({
         "status": "running",
         "message": "DevSecOps Pipeline - Hemant Raghav",
         "version": "3.0",
         "time": str(datetime.datetime.now())
     })
+
+
+@app.route('/slow')
+def slow():
+    # Simulates a slow endpoint — useful for seeing latency spikes in Grafana
+    REQUEST_COUNT.labels(endpoint='slow', method='GET').inc()
+    time.sleep(2)
+    return jsonify({"message": "This was a slow response — check Grafana for latency spike"})
 
 
 if __name__ == '__main__':
