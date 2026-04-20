@@ -85,6 +85,32 @@ AWS CloudTrail → S3 (all API actions logged)
 - Lambda health check pings /health every 5 minutes
 - Email alert if app stops responding
 
+## 📊 Monitoring Stack
+
+| Tool | URL | Purpose |
+|---|---|---|
+| Flask App | http://98.88.1.75:8080 | Live application |
+| Prometheus | http://98.88.1.75:9090 | Metrics storage |
+| Grafana | http://98.88.1.75:3000 | Visual dashboards |
+| /metrics | http://98.88.1.75:8080/metrics | Raw metrics endpoint |
+
+### Grafana Login
+- Username: admin
+- Password: devsecops123
+
+### Metrics Collected
+**App metrics (Flask):**
+- Total request count per endpoint
+- Requests per second
+- Average response time
+- HTTP status code distribution
+
+**System metrics (Node Exporter):**
+- CPU usage percentage
+- Memory usage
+- Disk usage and I/O
+- Network traffic
+
 ## 🔄 CI/CD Pipeline Flow
 ```
 Code Push → OWASP Scan → Docker Build → Trivy Scan
